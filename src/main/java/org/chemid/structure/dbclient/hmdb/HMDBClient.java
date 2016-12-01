@@ -13,7 +13,7 @@
 package org.chemid.structure.dbclient.hmdb;
 
 import org.chemid.structure.common.Constants;
-import org.chemid.structure.exception.CatchException;
+import org.chemid.structure.exception.ChemIDException;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.SDFWriter;
@@ -36,7 +36,7 @@ public class HMDBClient {
     boolean isInitial;
     String savedPath;
 
-    public String readSDF(double lowerMassValue, double upperMassValue, String location) throws CatchException {
+    public String readSDF(double lowerMassValue, double upperMassValue, String location) throws ChemIDException {
         savedPath = null;
         isInitial = true;
         Stream<IAtomContainer> stream = null;
@@ -49,7 +49,8 @@ public class HMDBClient {
             Iterable<IAtomContainer> iterables = () -> finalReader;
             StreamSupport.stream(iterables.spliterator(), true)
                     .filter(mol -> {
-                        return (Double.parseDouble(mol.getProperty(Constants.HMDBConstants.HMDB_MOLECULAR_WEIGHT)) > lowerMassValue && Double.parseDouble(mol.getProperty(Constants.HMDBConstants.HMDB_MOLECULAR_WEIGHT)) < upperMassValue);
+                        double mimw = Double.parseDouble(mol.getProperty(Constants.HMDBConstants.HMDB_MOLECULAR_WEIGHT));
+                        return (mimw > lowerMassValue && mimw < upperMassValue);
                     })
                     .forEach((m) -> {
                         try {
@@ -60,16 +61,14 @@ public class HMDBClient {
                             IAtomContainer container = m;
                             writer.write(container);
                         } catch (Exception e) {
-                            e.printStackTrace();
-                            new CatchException("Error occurred while writing results: " + e.getMessage());
+                            new ChemIDException("Error occurred while writing results: " + e.getMessage());
                         }
                     });
             if (writer != null) {
                 writer.close();
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            new CatchException("Error occurred while downloading hmdb: " + e.getMessage());
+            new ChemIDException("Error occurred while downloading hmdb: " + e.getMessage());
         }
         return savedPath;
     }
@@ -86,21 +85,20 @@ public class HMDBClient {
         try {
             writer = new SDFWriter(new FileWriter(output));
         } catch (Exception e) {
-            e.printStackTrace();
-            new CatchException("Error occurred while creating hmdb file: " + e.getMessage());
+            new ChemIDException("Error occurred while creating hmdb file: " + e.getMessage());
         }
         return savedPath;
     }
 
 
-    public String getResourceDocument() throws CatchException {
+    public String getResourceDocument() throws ChemIDException {
         String docPath = null;
         try {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             URL resource = classLoader.getResource(Constants.HMDBConstants.HMDB_RESOURCES + Constants.HMDBConstants.HMDB_OUTPUT_FILE);
             docPath = resource.getPath();
         } catch (Exception e) {
-            new CatchException("Error occurred while loading Resource File: " + e.getMessage());
+            new ChemIDException("Error occurred while loading Resource File: " + e.getMessage());
         }
         return docPath;
     }

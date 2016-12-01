@@ -21,29 +21,21 @@ import org.chemid.structure.dbclient.pubchem.beans.pubChemESearch;
 import org.chemid.structure.common.Constants;
 import org.chemid.structure.common.RestClient;
 import org.chemid.structure.common.XmlParser;
-import org.chemid.structure.exception.CatchException;
+import org.chemid.structure.exception.ChemIDException;
 import org.glassfish.jersey.client.ClientConfig;
 import org.w3c.dom.Document;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.zip.GZIPInputStream;
 
 public class PubChemClient {
 
     private pubChemESearch pubChemESearch;
     private RestClient restClient;
 
-    public pubChemESearch getPubChemESearchRequestParameters(String massRange) throws CatchException {
+    public pubChemESearch getPubChemESearchRequestParameters(String massRange) throws ChemIDException {
         pubChemESearch = new pubChemESearch();
 
         try {
@@ -68,12 +60,12 @@ public class PubChemClient {
                 pubChemESearch = null;
             }
         } catch (Exception e) {
-            throw new CatchException("Error occurred while getting PubChemESearch: " + e.getMessage());
+            throw new ChemIDException("Error occurred while getting PubChemESearch: " + e.getMessage());
         }
         return pubChemESearch;
     }
 
-    public String getDownloadURL(String massRange) throws CatchException {
+    public String getDownloadURL(String massRange) throws ChemIDException {
         String downloadUrl = null;
         try {
             //set webEnv, querykey to eSearch
@@ -91,12 +83,12 @@ public class PubChemClient {
 
         } catch (Exception e) {
 
-            throw new CatchException("Error occurred while getting PubChem download URL: " + e.getMessage());
+            throw new ChemIDException("Error occurred while getting PubChem download URL: " + e.getMessage());
         }
         return downloadUrl;
     }
 
-    public String pubQuery(String xmlPayload) throws CatchException {
+    public String pubQuery(String xmlPayload) throws ChemIDException {
         String pubQuery = null;
         try {
             //post request with query key, webenv
@@ -124,12 +116,12 @@ public class PubChemClient {
                     item(Constants.PubChemClient.ITEM_NUMBER).getFirstChild().getNodeValue();
 
         } catch (Exception e) {
-            new CatchException("Error occurred while getting PubChem query: " + e.getMessage());
+            new ChemIDException("Error occurred while getting PubChem query: " + e.getMessage());
         }
         return pubQuery;
     }
 
-    public String checkQuery(String requestID) throws CatchException {
+    public String checkQuery(String requestID) throws ChemIDException {
         String res = null;
         try {
             Document xmlPayload = XmlParser.getXMLPayload(Constants.PubChemClient.CHECK_QUERY_FILE_NAME,
@@ -147,12 +139,12 @@ public class PubChemClient {
             res = response.readEntity(String.class);
 
         } catch (Exception e) {
-            new CatchException("Error occurred while checking PubChem query: " + e.getMessage());
+            new ChemIDException("Error occurred while checking PubChem query: " + e.getMessage());
         }
         return res;
     }
 
-    public String saveFile(String Url, String location) throws CatchException {
+    public String saveFile(String Url, String location) throws ChemIDException {
         URL url = null;
         String savedPath = null;
         if (Url != null) {
@@ -172,7 +164,7 @@ public class PubChemClient {
                     savedPath = location + '/' + fileName;
                 }
             } catch (Exception e) {
-                new CatchException("Error occurred while saving PubChem results file : " + e.getMessage());
+                new ChemIDException("Error occurred while saving PubChem results file : " + e.getMessage());
 
             }
         }

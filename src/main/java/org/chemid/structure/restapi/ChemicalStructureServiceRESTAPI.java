@@ -19,13 +19,12 @@ import org.chemid.structure.dbclient.hmdb.utilities.HMDBTools;
 import org.chemid.structure.dbclient.pubchem.PubChemClient;
 import org.chemid.structure.dbclient.pubchem.utilities.PubchemTools;
 import org.chemid.structure.dbclient.utilities.Tools;
-import org.chemid.structure.exception.CatchException;
+import org.chemid.structure.exception.ChemIDException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.net.URL;
 import java.util.logging.FileHandler;
 
 /**
@@ -58,7 +57,7 @@ public class ChemicalStructureServiceRESTAPI {
                                         @PathParam("error") Double error,
                                         @PathParam("errorUnit") String errorUnit,
                                         @PathParam("fileFormat") String fileFormat,
-                                        @QueryParam("location") String location) throws CatchException {
+                                        @QueryParam("location") String location) throws ChemIDException {
         String sdfPath = null;
         String loc = location;
         try {
